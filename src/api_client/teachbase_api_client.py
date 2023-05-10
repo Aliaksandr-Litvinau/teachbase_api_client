@@ -20,8 +20,11 @@ class TeachbaseClient:
             'client_secret': self.client_secret,
             'grant_type': 'client_credentials'
         }
-        response = requests.post(url, data=payload)
-        response.raise_for_status()
+        try:
+            response = requests.post(url, data=payload)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            return f"Error: {e}"
         self.access_token = response.json()['access_token']
 
     def get(self, endpoint):
@@ -30,8 +33,11 @@ class TeachbaseClient:
         """
         url = f"{self.base_url}{endpoint}"
         headers = {"Authorization": f"Bearer {self.access_token}"}
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            return f"Error: {e}"
         return response.json()
 
     def post(self, endpoint, data):
@@ -41,10 +47,14 @@ class TeachbaseClient:
         url = f"{self.base_url}{endpoint}"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
+            "accept": "application/json",
             "Content-Type": "application/json",
         }
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            return f"Error: {e}"
         return response.json()
 
     def get_courses(self):
@@ -64,3 +74,15 @@ class TeachbaseClient:
         Creates a new user
         """
         return self.post("/endpoint/v1/users/create", request)
+
+    def get_course_sessions(self, course_id):
+        """
+        Retrieves sessions of the course with the given ID from Teachbase API
+        """
+        return self.get(f"/endpoint/v1/courses/{course_id}/course_sessions")
+
+    def register_user_for_session(self, session_id, user_data):
+        """
+        Registers a user for a session
+        """
+        return self.post(f"/endpoint/v1/course_sessions/{session_id}/register", user_data)
