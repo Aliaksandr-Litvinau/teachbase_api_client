@@ -6,3 +6,7 @@ pytz==2023.3
 sqlparse==0.4.4
 dj-database-url==2.0.0
 requests==2.30.0
+celery==5.2.7
+django-celery-beat==2.5.0
+django-celery-results==2.5.1
+redis==4.5.5
