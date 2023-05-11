@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'api_client',
+    'rest_framework',
+    'django_celery_results',
+    'django_celery_beat',
+
+    'api_client.apps.ApiClientConfig',
 ]
 
 MIDDLEWARE = [
@@ -124,3 +129,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 TEACHBASE_API_BASE_URL = os.environ.get('TEACHBASE_API')
+
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = 'django-db'
+
+CELERY_BEAT_SCHEDULE = {
+    'get_courses_from_teachbase': {
+        'task': 'api_client.tasks.get_courses_from_teachbase',
+        'schedule': crontab('0', '*', '*', '*', '*'),
+    },
+}
