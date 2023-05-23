@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_celery_results',
     'django_celery_beat',
+    'drf_spectacular',
 
     'api_client.apps.ApiClientConfig',
 ]
@@ -138,4 +139,18 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'api_client.tasks.get_courses_from_teachbase',
         'schedule': crontab('0', '*', '*', '*', '*'),
     },
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Teachbase API client",
+    "VERSION": "0.0.1",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {
+        "filter": True,
+    },
+    "COMPONENT_SPLIT_REQUEST": True
 }
